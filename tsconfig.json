@@ -1,0 +1,35 @@
+{
+  "allowJs": true,
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "outDir": "./build", //Sera la salida para produccion.
+    "rootDir": "./src", //Este sera el punto de entrada de typescript.
+    "strict": true,
+    "target": "ESNext"
+  },
+  "emitDecoratorMetadata": true,
+  "esModuleInterop": true,
+  "exclude": [
+    "node_modules",
+    "build",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ],
+  "experimentalDecorators": true,
+  "forceConsistentCasingInFileNames": true,
+  "include": [
+    "index.d.ts",
+    "src/**/*.ts"
+  ],
+  "incremental": true,
+  "isolatedModules": true,
+  "module": "esnext",
+  "moduleResolution": "node",
+  "noEmit": true,
+  "resolveJsonModule": true,
+  "skipLibCheck": true,
+  "strict": true
+}

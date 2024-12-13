@@ -41,3 +41,9 @@ CREATE TABLE IF NOT EXISTS `users` (
 ```bash
 npm run dev
 ```
+
+Nota se debe agregar un usuario para poder prbarlo en el frontend
+
+Agrega el usuario desde tu cliente rest de preferencia
+
+![alt text](image.png)

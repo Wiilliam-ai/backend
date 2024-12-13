@@ -1,2 +1,4 @@
 mysqldata
 node_modules
+
+.env

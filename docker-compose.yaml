@@ -18,4 +18,4 @@ services:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: 123456
     ports:
-      - "8080:80"
+      - "8180:80"

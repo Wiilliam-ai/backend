@@ -1,7 +1,7 @@
 import knex from "knex";
 
 const database = knex({
-  client: "mysql",
+  client: "mysql2",
   connection: {
     host: "localhost",
     port: 3306,

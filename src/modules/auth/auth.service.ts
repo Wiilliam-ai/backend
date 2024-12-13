@@ -1,6 +1,7 @@
 import { Bcrypt } from "../../config/bcrypt";
 import database from "../../config/database";
 import { AuthDatasource } from "../../domain/datasource/auth.datasource";
+import { AuthDto } from "../../domain/dtos/auth.dto";
 import {
   type RegisterUserDto,
   type LoginUserDto,
@@ -9,13 +10,29 @@ import { UserEntity } from "../../domain/entityes/user.entity";
 import { CustomError } from "../../helpers/errors/custom-error";
 
 export class AuthService implements AuthDatasource {
+  async verify(authDto: AuthDto): Promise<UserEntity> {
+    const user = await database("users")
+      .select<{
+        id: number;
+        username: string;
+        first_name: string;
+        last_name: string;
+      }>(["id", "username", "first_name", "last_name"])
+      .where({ id: authDto.id })
+      .first();
+
+    if (!user) throw CustomError.badRequest("User not found");
+
+    return {
+      id: user.id,
+      username: user.username,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      password: "",
+    };
+  }
   async register(registerUserDto: RegisterUserDto): Promise<UserEntity> {
     const { username } = registerUserDto;
-    // database contiene la conexión a la base de datos
-    // todo: usar aqui knex
-    // Todo: verificar que el usuario no exista
-    // Todo: encriptar la contraseña
-    // Todo: guardar el usuario en la base de datos
 
     const existingUser = await database("users")
       .select("*")
@@ -26,12 +43,12 @@ export class AuthService implements AuthDatasource {
 
     const passwordHash = Bcrypt.hash(registerUserDto.password);
 
-    const [id] = await database("users")
-      .insert({
-        ...registerUserDto,
-        password: passwordHash,
-      })
-      .returning(["id"]);
+    const [id] = await database("users").insert({
+      first_name: registerUserDto.firstName,
+      last_name: registerUserDto.lastName,
+      username: registerUserDto.username,
+      password: passwordHash,
+    });
 
     return {
       id,
@@ -40,12 +57,32 @@ export class AuthService implements AuthDatasource {
     };
   }
   async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
+    const user = await database("users")
+      .select<{
+        id: number;
+        username: string;
+        password: string;
+        first_name: string;
+        last_name: string;
+      }>(["id", "username", "password", "first_name", "last_name"])
+      .where({ username: loginUserDto.username })
+      .first();
+
+    if (!user) throw CustomError.badRequest("User not found");
+
+    const isPasswordValid = Bcrypt.compare(
+      loginUserDto.password,
+      user.password
+    );
+
+    if (!isPasswordValid) throw CustomError.badRequest("Invalid password");
+
     return {
-      id: 1,
-      firstName: "John",
-      lastName: "Doe",
-      username: loginUserDto.username,
-      password: loginUserDto.password,
+      id: user.id,
+      username: user.username,
+      password: user.password,
+      firstName: user.first_name,
+      lastName: user.last_name,
     };
   }
 }

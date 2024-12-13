@@ -5,6 +5,7 @@ import { CustomError } from "../../helpers/errors/custom-error";
 import { CustomResponse } from "../../helpers/custom/custom-response";
 import { AuthService } from "./auth.service";
 import { JwtAuth } from "../../config/jwtauth";
+import { AuthDto } from "../../domain/dtos/auth.dto";
 
 export class AuthController {
   static async login(req: Request, res: Response) {
@@ -45,7 +46,31 @@ export class AuthController {
       CustomResponse.execute({
         message: "User registered",
         res,
-        data: registerUserDto,
+        data: user,
+      });
+    } catch (error) {
+      HandleError.execute(error, res);
+    }
+  }
+
+  static async verify(req: Request, res: Response) {
+    try {
+      const [error, authDto] = AuthDto.check(req.body);
+      if (error) throw CustomError.badRequest(error);
+
+      const authServices = new AuthService();
+      const user = await authServices.verify(authDto!);
+
+      CustomResponse.execute({
+        message: "User verified",
+        res,
+        data: {
+          user: {
+            id: user.id,
+            fullName: user.firstName + " " + user.lastName,
+            username: user.username,
+          },
+        },
       });
     } catch (error) {
       HandleError.execute(error, res);
